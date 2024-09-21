@@ -62,7 +62,7 @@ function getWebviewContent() {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
+		<style>
             body {
                 font-family: Arial, sans-serif;
                 margin: 0;
@@ -70,7 +70,8 @@ function getWebviewContent() {
                 display: flex;
                 flex-direction: column;
                 height: 100vh;
-                background-color: #f4f4f4;
+                background-color: #000; /* Black background for high contrast */
+                color: #fff; /* White text for high contrast */
             }
 
             .chat-container {
@@ -80,10 +81,11 @@ function getWebviewContent() {
                 justify-content: flex-end;
                 padding: 10px;
                 overflow-y: auto;
-                background-color: #fff;
-                border: 1px solid #ccc;
+                background-color: #000; /* Black background */
+                border: 2px solid #fff; /* White border for contrast */
                 margin: 20px;
                 border-radius: 10px;
+                color: #fff; /* Ensure text remains white */
             }
 
             .chat-message {
@@ -96,15 +98,15 @@ function getWebviewContent() {
             }
 
             .chat-message.user {
-                background-color: #007bff;
-                color: white;
+                background-color: #00ff00; /* Bright green for user message */
+                color: black; /* Black text for user message */
                 align-self: flex-end;
                 border-top-right-radius: 0;
             }
 
             .chat-message.bot {
-                background-color: #e1e1e1;
-                color: black;
+                background-color: #ff00ff; /* Bright magenta for bot message */
+                color: black; /* Black text for bot message */
                 align-self: flex-start;
                 border-top-left-radius: 0;
             }
@@ -112,23 +114,25 @@ function getWebviewContent() {
             .chat-input-container {
                 display: flex;
                 padding: 10px;
-                border-top: 1px solid #ccc;
-                background-color: #fff;
+                border-top: 2px solid #fff; /* White border for contrast */
+                background-color: #000; /* Black background */
             }
 
             .chat-input {
                 flex-grow: 1;
                 padding: 10px;
                 border-radius: 5px;
-                border: 1px solid #ccc;
+                border: 2px solid #fff; /* White border */
                 font-size: 16px;
+                background-color: #000; /* Black background */
+                color: #fff; /* White text */
             }
 
             .chat-send-btn {
                 margin-left: 10px;
                 padding: 10px 15px;
-                background-color: #007bff;
-                color: white;
+                background-color: #00ff00; /* Bright green for button */
+                color: black; /* Black text on button */
                 border: none;
                 border-radius: 5px;
                 font-size: 16px;
@@ -136,7 +140,7 @@ function getWebviewContent() {
             }
 
             .chat-send-btn:hover {
-                background-color: #0056b3;
+                background-color: #007b00; /* Slightly darker green for hover effect */
             }
         </style>
         <title>Chat Interface</title>
