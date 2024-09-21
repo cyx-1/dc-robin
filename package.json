@@ -4,7 +4,7 @@
   "description": "workflow assistant",
   "publisher": "ZenofSoftware",
   "icon": "icon.png",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/cyx-1/dc-robin.git"
@@ -20,10 +20,19 @@
   "contributes": {
     "commands": [
       {
-        "command": "dc-robin.helloWorld",
-        "title": "Hello World"
+        "command": "dc-robin.showHello",
+        "title": "Show Hello"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "webviewHello",
+          "title": "Hello",
+          "icon": "resources/hello-icon.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
