@@ -6,63 +6,43 @@ import * as vscode from 'vscode';
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "dc-robin" is now active!');
+    // Use the console to output diagnostic information (console.log) and errors (console.error)
+    // This line of code will only be executed once when your extension is activated
+    console.log('Congratulations, your extension "dc-robin" is now active!');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	// const disposable = vscode.commands.registerCommand('dc-robin.helloWorld', () => {
-	// The code you place here will be executed every time your command is executed
-	// Display a message box to the user
-	// console.log('hello world 2');
-	// vscode.window.showInformationMessage('Hello World from DC Robin!');
-	// });
+    // Register a new command that shows a WebView
+    const disposable = vscode.commands.registerCommand('webviewHello.showHello', () => {
+        console.log('hello');
+        // Create and show a new WebView
+        const panel = vscode.window.createWebviewPanel(
+            'helloWebview', // Internal identifier for the WebView
+            'Hello', // Title for the WebView panel
+            vscode.ViewColumn.One, // Show it in the first column
+            {
+                enableScripts: true
+            } // WebView options
+        );
 
-	// Register a new command that shows a WebView
-	const disposable = vscode.commands.registerCommand('dc-robin.showHello', () => {
-		// Create and show a new WebView
-		const panel = vscode.window.createWebviewPanel(
-			'helloWebview', // Internal identifier for the WebView
-			'Hello', // Title for the WebView panel
-			vscode.ViewColumn.One, // Show it in the first column
-			{
-				enableScripts: true
-			} // WebView options
-		);
+        // Set the content of the WebView
+        panel.webview.html = getWebviewContent();
 
-		// Set the content of the WebView
-		panel.webview.html = getWebviewContent();
+        // Handle messages from the WebView
+        panel.webview.onDidReceiveMessage(message => {
+            panel.webview.postMessage({ type: 'botMessage', text: `Response to: ${message.text}` });
+        });
+    });
 
-		// Create a new icon in the activity bar (side bar)
-		//const myViewProvider = new MyViewProvider(context.extensionUri);
-		//context.subscriptions.push(
-		//vscode.window.registerWebviewViewProvider(MyViewProvider.viewType, myViewProvider));
-	});
-
-	context.subscriptions.push(disposable);
+    context.subscriptions.push(disposable);
 }
 
-class MyViewProvider implements vscode.WebviewViewProvider {
-	public static readonly viewType = 'webviewHello.view';
-
-	constructor(private readonly extensionUri: vscode.Uri) { }
-
-	resolveWebviewView(webviewView: vscode.WebviewView) {
-		// Set WebView content
-		webviewView.webview.options = { enableScripts: true };
-		webviewView.webview.html = getWebviewContent();
-	}
-}
 function getWebviewContent() {
-	return `
+    return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<style>
+        <style>
             body {
                 font-family: Arial, sans-serif;
                 margin: 0;
@@ -70,8 +50,8 @@ function getWebviewContent() {
                 display: flex;
                 flex-direction: column;
                 height: 100vh;
-                background-color: #000; /* Black background for high contrast */
-                color: #fff; /* White text for high contrast */
+                background-color: #1e1e1e; /* Dark background */
+                color: #d4d4d4; /* Light text for readability */
             }
 
             .chat-container {
@@ -81,11 +61,11 @@ function getWebviewContent() {
                 justify-content: flex-end;
                 padding: 10px;
                 overflow-y: auto;
-                background-color: #000; /* Black background */
-                border: 2px solid #fff; /* White border for contrast */
+                background-color: #252526; /* Dark gray background for chat container */
+                border: 1px solid #3c3c3c; /* Slightly lighter border */
                 margin: 20px;
                 border-radius: 10px;
-                color: #fff; /* Ensure text remains white */
+                color: #d4d4d4; /* Light text */
             }
 
             .chat-message {
@@ -98,15 +78,15 @@ function getWebviewContent() {
             }
 
             .chat-message.user {
-                background-color: #00ff00; /* Bright green for user message */
-                color: black; /* Black text for user message */
+                background-color: #007acc; /* Blue for user message */
+                color: white; /* White text for contrast */
                 align-self: flex-end;
                 border-top-right-radius: 0;
             }
 
             .chat-message.bot {
-                background-color: #ff00ff; /* Bright magenta for bot message */
-                color: black; /* Black text for bot message */
+                background-color: #3c3c3c; /* Dark gray for bot message */
+                color: #d4d4d4; /* Light text */
                 align-self: flex-start;
                 border-top-left-radius: 0;
             }
@@ -114,25 +94,25 @@ function getWebviewContent() {
             .chat-input-container {
                 display: flex;
                 padding: 10px;
-                border-top: 2px solid #fff; /* White border for contrast */
-                background-color: #000; /* Black background */
+                border-top: 1px solid #3c3c3c; /* Slightly lighter border */
+                background-color: #252526; /* Dark background for input container */
             }
 
             .chat-input {
                 flex-grow: 1;
                 padding: 10px;
                 border-radius: 5px;
-                border: 2px solid #fff; /* White border */
+                border: 1px solid #3c3c3c; /* Dark gray border */
                 font-size: 16px;
-                background-color: #000; /* Black background */
-                color: #fff; /* White text */
+                background-color: #1e1e1e; /* Darker background for input */
+                color: #d4d4d4; /* Light text */
             }
 
             .chat-send-btn {
                 margin-left: 10px;
                 padding: 10px 15px;
-                background-color: #00ff00; /* Bright green for button */
-                color: black; /* Black text on button */
+                background-color: #007acc; /* Blue for button */
+                color: white; /* White text for button */
                 border: none;
                 border-radius: 5px;
                 font-size: 16px;
@@ -140,7 +120,7 @@ function getWebviewContent() {
             }
 
             .chat-send-btn:hover {
-                background-color: #007b00; /* Slightly darker green for hover effect */
+                background-color: #005f9e; /* Darker blue for hover */
             }
         </style>
         <title>Chat Interface</title>
@@ -159,26 +139,48 @@ function getWebviewContent() {
             const chatInput = document.getElementById('chat-input');
             const chatSendBtn = document.getElementById('chat-send-btn');
 
-            chatSendBtn.addEventListener('click', () => {
+            // Function to send the message
+            const sendMessage = () => {
                 const message = chatInput.value.trim();
                 if (message) {
                     addMessage('user', message);
                     chatInput.value = '';
-                    
-                    // Simulate a bot response after a short delay
-                    setTimeout(() => {
-                        addMessage('bot', 'This is a response from the bot!');
-                    }, 1000);
+
+                    // Send message to VS Code extension
+                    vscode.postMessage({ type: 'userMessage', text: message });
+                }
+            };
+            
+            // Listen for click on send button
+            chatSendBtn.addEventListener('click', sendMessage);
+
+            // Listen for 'Enter' key press to send message
+            chatInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault(); // Prevent default Enter behavior (e.g., form submission)
+                    sendMessage();
                 }
             });
 
             function addMessage(sender, text) {
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('chat-message', sender);
-                messageDiv.textContent = text;
+                messageDiv.innerHTML = text;
+                messageDiv.classList.add('markdown-content'); // 
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
             }
+
+            // Handle messages from the extension
+            window.addEventListener('message', event => {
+                const message = event.data;
+                if (message.type === 'botMessage') {
+                    addMessage('bot', message.text);
+                }
+            });
+
+            // Initialize VS Code API
+            const vscode = acquireVsCodeApi();
         </script>
     </body>
     </html>

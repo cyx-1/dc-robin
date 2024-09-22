@@ -20,7 +20,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "dc-robin.showHello",
+        "command": "webviewHello.showHello",
         "title": "Show Hello"
       }
     ],
@@ -30,6 +30,14 @@
           "id": "webviewHello",
           "title": "Hello",
           "icon": "resources/hello-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "webviewHello": [
+        {
+          "id": "webviewHello.view",
+          "name": "Hello View"
         }
       ]
     }
