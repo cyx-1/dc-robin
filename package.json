@@ -4,7 +4,7 @@
   "description": "workflow assistant",
   "publisher": "ZenofSoftware",
   "icon": "icon.png",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/cyx-1/dc-robin.git"
