@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { marked } from 'marked';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -11,24 +12,34 @@ export function activate(context: vscode.ExtensionContext) {
     console.log('Congratulations, your extension "dc-robin" is now active!');
 
     // Register a new command that shows a WebView
-    const disposable = vscode.commands.registerCommand('webviewHello.showHello', () => {
-        console.log('hello');
+    const disposable = vscode.commands.registerCommand('dc-robin.showChat', () => {
         // Create and show a new WebView
         const panel = vscode.window.createWebviewPanel(
-            'helloWebview', // Internal identifier for the WebView
-            'Hello', // Title for the WebView panel
+            'dc-robin.showChatView', // Internal identifier for the WebView
+            'DC Robin', // Title for the WebView panel
             vscode.ViewColumn.One, // Show it in the first column
             {
-                enableScripts: true
+                enableScripts: true,
+                retainContextWhenHidden: true
             } // WebView options
         );
-
+        let count = 0;
         // Set the content of the WebView
         panel.webview.html = getWebviewContent();
 
         // Handle messages from the WebView
         panel.webview.onDidReceiveMessage(message => {
-            panel.webview.postMessage({ type: 'botMessage', text: `Response to: ${message.text}` });
+            const timestamp: number = Date.now();
+            const formattedDate: string = new Date(timestamp).toLocaleString();
+            const markdown = `##### ${formattedDate} Please ask me anything, or pick from menu below:
+| Test1     | Test2 | Test3      |
+|-----------|-------|------------|
+| Data 1    | 23    | location   |`;
+
+            const html = marked(markdown);
+            count++;
+
+            panel.webview.postMessage({ type: 'botMessage', text: `${html} <br>${count}` });
         });
     });
 
@@ -53,7 +64,14 @@ function getWebviewContent() {
                 background-color: #1e1e1e; /* Dark background */
                 color: #d4d4d4; /* Light text for readability */
             }
-
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+            }
             .chat-container {
                 flex-grow: 1;
                 display: flex;
@@ -66,6 +84,19 @@ function getWebviewContent() {
                 margin: 20px;
                 border-radius: 10px;
                 color: #d4d4d4; /* Light text */
+            }
+            /* Optional: Customize scrollbar appearance */
+            .chat-container::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .chat-container::-webkit-scrollbar-thumb {
+                background-color: #3c3c3c;
+                border-radius: 10px;
+            }
+
+            .chat-container::-webkit-scrollbar-track {
+                background-color: #252526;
             }
 
             .chat-message {
@@ -127,7 +158,6 @@ function getWebviewContent() {
     </head>
     <body>
         <div class="chat-container" id="chat-container">
-            <div class="chat-message bot">Hello! How can I assist you today?</div>
         </div>
         <div class="chat-input-container">
             <input id="chat-input" type="text" class="chat-input" placeholder="Type a message..." />
@@ -143,11 +173,12 @@ function getWebviewContent() {
             const sendMessage = () => {
                 const message = chatInput.value.trim();
                 if (message) {
-                    addMessage('user', message);
+                    addMessage('user', message, true);
                     chatInput.value = '';
 
                     // Send message to VS Code extension
                     vscode.postMessage({ type: 'userMessage', text: message });
+
                 }
             };
             
@@ -162,25 +193,57 @@ function getWebviewContent() {
                 }
             });
 
-            function addMessage(sender, text) {
+            function addMessage(sender, text, savestate) {
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('chat-message', sender);
                 messageDiv.innerHTML = text;
-                messageDiv.classList.add('markdown-content'); // 
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight; // Scroll to bottom
+                if (savestate) {
+                    saveState();
+                }
+            }
+
+            // Save the current chat state
+            function saveState() {
+                const messages = Array.from(chatContainer.children).map(msg => ({
+                    sender: msg.classList.contains('user') ? 'user' : 'bot',
+                    text: msg.innerHTML
+                }));
+                vscode.setState({ messages });
+            }
+
+            // Restore the chat state when WebView is reloaded
+            function restoreState() {
+                const state = vscode.getState();
+                if (state && state.messages) {
+                    state.messages.forEach(msg => {
+                        addMessage(msg.sender, msg.text, false);
+                    });
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
             // Handle messages from the extension
             window.addEventListener('message', event => {
                 const message = event.data;
                 if (message.type === 'botMessage') {
-                    addMessage('bot', message.text);
+                    addMessage('bot', message.text, true);
                 }
             });
 
             // Initialize VS Code API
             const vscode = acquireVsCodeApi();
+
+            // Restore state when WebView is loaded
+            hasContent = restoreState();
+            if (!hasContent) {
+                addMessage('bot', 'hello', false);
+            }
+
+            chatInput.focus();
         </script>
     </body>
     </html>
